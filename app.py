@@ -8,7 +8,6 @@ app = Flask(__name__)
 
 LOG_FILE = 'visits.json'
 
-# Create empty log file if it doesn't exist
 if not os.path.exists(LOG_FILE):
     with open(LOG_FILE, 'w') as f:
         json.dump([], f)
@@ -26,7 +25,7 @@ def get_country_info(ip):
     except:
         return "Unknown", "🌍"
 
-def log_visit(country_code, flag, path):
+def log_visit(ip, country_code, flag, path):
     visits = []
     try:
         with open(LOG_FILE, 'r') as f:
@@ -36,18 +35,18 @@ def log_visit(country_code, flag, path):
     
     visits.append({
         'time': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        'ip': ip,
         'country': country_code,
         'flag': flag,
         'path': path
     })
     
-    # Keep only last 50 visits
     visits = visits[-50:]
     
     with open(LOG_FILE, 'w') as f:
         json.dump(visits, f, indent=2)
     
-    print(f"Visit logged: {flag} {country_code} → {path}")
+    print(f"Visit logged: {flag} {country_code} | IP: {ip} → {path}")
 
 @app.route('/')
 def index():
@@ -56,9 +55,9 @@ def index():
         ip = request.headers['X-Forwarded-For'].split(',')[0].strip()
     
     country_code, flag = get_country_info(ip)
-    log_visit(country_code, flag, '/')
+    log_visit(ip, country_code, flag, '/')
     
-    return render_template('index.html', flag=flag, country=country_code)
+    return render_template('index.html', flag=flag, country=country_code, warning=True)
 
 @app.route('/stats')
 def stats():
@@ -89,7 +88,7 @@ def tracker(short_code):
         ip = request.headers['X-Forwarded-For'].split(',')[0].strip()
     
     country_code, flag = get_country_info(ip)
-    log_visit(country_code, flag, f'/go/{short_code}')
+    log_visit(ip, country_code, flag, f'/go/{short_code}')
     
     return redirect(target)
 
