@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Visitor Stats{% endblock %}
+
+{% block content %}
+<h1 class="text-center mb-5 display-4">Recent Visitors 🌎</h1>
+
+{% if visits %}
+<div class="row row-cols-1 row-cols-md-3 g-4">
+    {% for visit in visits %}
+    <div class="col">
+        <div class="card h-100 bg-secondary border-0 shadow hover-card">
+            <div class="card-body text-center py-5">
+                <div class="display-3 mb-3">{{ visit.flag }}</div>
+                <h5 class="card-title">{{ visit.country }}</h5>
+                <p class="text-muted small">
+                    {{ visit.time }}<br>
+                    Path: {{ visit.path }}
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-5">
+    <h3>No visits yet 👻</h3>
+    <p>Start clicking links on the home page!</p>
+</div>
+{% endif %}
+{% endblock %}

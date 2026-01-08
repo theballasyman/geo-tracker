@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="text-center py-5">
+    <h1 class="display-1 mb-4 flag-big">{{ flag }}</h1>
+    <h2 class="display-5 mb-5">Welcome from <strong>{{ country }}</strong>!</h2>
+    
+    <hr class="my-5 border-light">
+    
+    <h3 class="mb-4">Test Tracker Links</h3>
+    <div class="row g-4 justify-content-center">
+        <div class="col-md-3">
+            <a href="/go/google" class="btn btn-danger btn-lg w-100">Google</a>
+        </div>
+        <div class="col-md-3">
+            <a href="/go/youtube" class="btn btn-danger btn-lg w-100">YouTube</a>
+        </div>
+        <div class="col-md-3">
+            <a href="/go/github" class="btn btn-dark btn-lg w-100">GitHub</a>
+        </div>
+        <div class="col-md-3">
+            <a href="/go/x" class="btn btn-info btn-lg w-100">X (Twitter)</a>
+        </div>
+    </div>
+    
+    <p class="mt-5 text-muted">Every click logs your country flag in the stats page 👀</p>
+</div>
+{% endblock %}
