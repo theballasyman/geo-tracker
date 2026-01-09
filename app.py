@@ -8,13 +8,12 @@ app = Flask(__name__)
 
 LOG_FILE = 'visits.json'
 
-# Create file if missing
 if not os.path.exists(LOG_FILE):
     with open(LOG_FILE, 'w') as f:
         json.dump([], f)
 
 def get_country_info(ip):
-    if ip in ['127.0.0.1', '::1'] or ip.startswith('192.168.'):
+    if ip.startswith('127.') or ip.startswith('192.168.') or ip == '::1':
         return "Local", "🏠"
     
     try:
@@ -52,14 +51,13 @@ def log_visit(ip, country_code, flag, path):
 @app.route('/')
 def index():
     ip = request.remote_addr
-    forwarded = request.headers.get('X-Forwarded-For')
-    if forwarded:
-        ip = forwarded.split(',')[0].strip()
+    if 'X-Forwarded-For' in request.headers:
+        ip = request.headers['X-Forwarded-For'].split(',')[0].strip()
     
     country_code, flag = get_country_info(ip)
     log_visit(ip, country_code, flag, '/')
     
-    return render_template('index.html', flag=flag, country=country_code, ip=ip)
+    return render_template('index.html', flag=flag, country=country_code, warning=True)
 
 @app.route('/stats')
 def stats():
@@ -74,7 +72,11 @@ def stats():
 @app.route('/go/<short_code>')
 def tracker(short_code):
     redirects = {
-        'track': 'https://example.com'  # change if you want
+        'google': 'https://google.com',
+        'youtube': 'https://youtube.com',
+        'github': 'https://github.com',
+        'x': 'https://x.com',
+        'reddit': 'https://reddit.com'
     }
     
     target = redirects.get(short_code.lower())
@@ -82,16 +84,13 @@ def tracker(short_code):
         return "<h1>404 - Link not found 😢</h1>", 404
     
     ip = request.remote_addr
-    forwarded = request.headers.get('X-Forwarded-For')
-    if forwarded:
-        ip = forwarded.split(',')[0].strip()
+    if 'X-Forwarded-For' in request.headers:
+        ip = request.headers['X-Forwarded-For'].split(',')[0].strip()
     
     country_code, flag = get_country_info(ip)
     log_visit(ip, country_code, flag, f'/go/{short_code}')
     
     return redirect(target)
 
-# Remove the if __name__ block completely for production (Gunicorn doesn't use it)
-
-# if __name__ == '__main__':
-#     app.run(debug=True)
+if __name__ == '__main__':
+    app.run(debug=True)
